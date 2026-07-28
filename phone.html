@@ -90,6 +90,12 @@
   </div>
 <script>
   (function () {
+    // Telefon: ramka-w-ramce gubi safe-area (iOS nie przekazuje env() do
+    // iframe) — otwieramy pelna apke bezposrednio.
+    if (window.matchMedia('(max-width: 520px)').matches) {
+      window.location.replace('./index.html');
+      return;
+    }
     var fit = function () {
       if (window.matchMedia('(max-width: 520px)').matches) {
         document.documentElement.style.setProperty('--s', 1);
