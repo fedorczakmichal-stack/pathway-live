@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pathway — phone preview</title>
+<style>
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(120% 120% at 50% 0%, #123a30 0%, #0b2922 45%, #051a16 100%);
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #f1e6d4;
+  }
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 28px 16px;
+    box-sizing: border-box;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+    font-size: 13px;
+    color: #e5cd9c;
+  }
+  .device {
+    width: 390px;
+    height: 844px;
+    max-height: calc(100vh - 130px);
+    aspect-ratio: 390 / 844;
+    border-radius: 44px;
+    padding: 10px;
+    background: #0a0f0d;
+    box-shadow:
+      0 0 0 1px rgba(228, 207, 152, 0.22),
+      0 30px 80px rgba(0, 0, 0, 0.55);
+    box-sizing: border-box;
+  }
+  .device iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 34px;
+    background: #071d18;
+  }
+  .hint { font-size: 12.5px; opacity: 0.75; margin: 0; }
+  .hint a { color: #e5cd9c; }
+  /* Na prawdziwym telefonie ramka nie ma sensu — pelny ekran */
+  @media (max-width: 520px) {
+    .stage { padding: 0; gap: 0; }
+    .brand, .hint { display: none; }
+    .device {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-height: none;
+      aspect-ratio: auto;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+    .device iframe { border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="brand">PATHWAY · PHONE PREVIEW</div>
+    <div class="device">
+      <iframe src="./index.html" title="Pathway — clickable prototype (phone preview)" allow="fullscreen"></iframe>
+    </div>
+    <p class="hint">Desktop preview in a 390×844 frame · <a href="./index.html">open full screen</a></p>
+  </div>
+</body>
+</html>
