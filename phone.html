@@ -18,8 +18,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 18px;
-    padding: 28px 16px;
+    gap: 14px;
+    padding: 20px 16px;
     box-sizing: border-box;
   }
   .brand {
@@ -28,56 +28,80 @@
     gap: 10px;
     letter-spacing: 0.18em;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12.5px;
     color: #e5cd9c;
   }
+  /* Ramka trzyma STAŁE 390x844 (apka jest projektowana na ten viewport)
+     i jest tylko skalowana do okna — nigdy ściskana. */
+  .frame-slot {
+    width: calc(410px * var(--s, 1));
+    height: calc(864px * var(--s, 1));
+  }
   .device {
-    width: 390px;
-    height: 844px;
-    max-height: calc(100vh - 130px);
-    aspect-ratio: 390 / 844;
-    border-radius: 44px;
+    width: 410px;
+    height: 864px;
     padding: 10px;
+    border-radius: 44px;
     background: #0a0f0d;
     box-shadow:
       0 0 0 1px rgba(228, 207, 152, 0.22),
       0 30px 80px rgba(0, 0, 0, 0.55);
     box-sizing: border-box;
+    transform: scale(var(--s, 1));
+    transform-origin: top left;
   }
   .device iframe {
-    width: 100%;
-    height: 100%;
+    width: 390px;
+    height: 844px;
     border: 0;
     border-radius: 34px;
     background: #071d18;
+    display: block;
   }
-  .hint { font-size: 12.5px; opacity: 0.75; margin: 0; }
+  .hint { font-size: 12.5px; opacity: 0.75; margin: 0; text-align: center; }
   .hint a { color: #e5cd9c; }
-  /* Na prawdziwym telefonie ramka nie ma sensu — pelny ekran */
+  /* Na prawdziwym telefonie ramka nie ma sensu — pełny ekran */
   @media (max-width: 520px) {
     .stage { padding: 0; gap: 0; }
     .brand, .hint { display: none; }
+    .frame-slot { width: 100vw; height: 100dvh; }
     .device {
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      max-height: none;
-      aspect-ratio: auto;
-      border-radius: 0;
       padding: 0;
+      border-radius: 0;
       box-shadow: none;
+      transform: none;
     }
-    .device iframe { border-radius: 0; }
+    .device iframe { width: 100%; height: 100%; border-radius: 0; }
   }
 </style>
 </head>
 <body>
   <div class="stage">
     <div class="brand">PATHWAY · PHONE PREVIEW</div>
-    <div class="device">
-      <iframe src="./index.html" title="Pathway — clickable prototype (phone preview)" allow="fullscreen"></iframe>
+    <div class="frame-slot" id="slot">
+      <div class="device" id="device">
+        <iframe src="./index.html" title="Pathway — clickable prototype (phone preview)" allow="fullscreen"></iframe>
+      </div>
     </div>
-    <p class="hint">Desktop preview in a 390×844 frame · <a href="./index.html">open full screen</a></p>
+    <p class="hint">Podgląd na komputerze w ramce 390×844 · <a href="./index.html">otwórz na pełnym ekranie</a></p>
   </div>
+<script>
+  (function () {
+    var fit = function () {
+      if (window.matchMedia('(max-width: 520px)').matches) {
+        document.documentElement.style.setProperty('--s', 1);
+        return;
+      }
+      var available = window.innerHeight - 120;
+      var scale = Math.min(1, Math.max(0.4, available / 864));
+      document.documentElement.style.setProperty('--s', scale);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+  })();
+</script>
 </body>
 </html>
