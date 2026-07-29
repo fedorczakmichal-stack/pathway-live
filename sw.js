@@ -11,13 +11,32 @@ const VERSION = "v60";
 const CACHE = `pathway-${VERSION}`;
 const OFFLINE_FALLBACK = "./index.html";
 
+// GitHub Pages wysyła `Cache-Control: max-age=600`, a zwykły fetch()
+// respektuje cache HTTP przeglądarki — przez 10 minut po deployu network-first
+// oddawałby STARY dokument mimo działającej sieci, czyli dokładnie ten ból,
+// przed którym ten worker ma chronić. `cache: "no-cache"` wymusza rewalidację
+// (tanią: przy braku zmian wraca 304 bez treści), a NIE "reload", który
+// ściągałby 5,3 MB przy każdym otwarciu apki.
+const revalidating = (request) => new Request(request.url, {
+  cache: "no-cache",
+  credentials: "same-origin",
+  redirect: "follow",
+});
+
 self.addEventListener("install", (event) => {
   // Nie precache'ujemy listy plików: apka to jeden dokument, a 404 na
-  // brakującym wpisie wywróciłby całą instalację. Dokument trafia do
-  // cache'u przy pierwszym udanym pobraniu.
+  // brakującym wpisie wywróciłby całą instalację.
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.add(OFFLINE_FALLBACK)).catch(() => undefined),
+    (async () => {
+      try {
+        const cache = await caches.open(CACHE);
+        const response = await fetch(new Request(OFFLINE_FALLBACK, { cache: "no-cache" }));
+        if (response && response.ok) await cache.put(OFFLINE_FALLBACK, response);
+      } catch {
+        // Bez sieci przy instalacji tryb offline dojrzeje przy pierwszej nawigacji.
+      }
+    })(),
   );
 });
 
@@ -42,18 +61,37 @@ const putInCache = async (request, response) => {
   }
 };
 
+// Dokument waży 5,3 MB, więc na słabym LTE albo w captive portalu fetch
+// potrafi wisieć dziesiątki sekund — a zainstalowana apka stoi wtedy na
+// splashu, mimo że kompletna kopia leży w cache'u. Po SLOW_NETWORK_MS
+// oddajemy cache, ale pobieranie leci dalej i i tak odświeży cache.
+const SLOW_NETWORK_MS = 6000;
+const afterTimeout = (ms) => new Promise((resolve) => setTimeout(() => resolve(null), ms));
+
 const networkFirst = async (request, fallbackToDocument) => {
-  try {
-    const response = await fetch(request);
+  const networkPromise = fetch(revalidating(request)).then((response) => {
     if (response && response.ok) putInCache(request, response.clone());
     return response;
+  });
+
+  if (fallbackToDocument) {
+    try {
+      const winner = await Promise.race([networkPromise, afterTimeout(SLOW_NETWORK_MS)]);
+      if (winner) return winner;
+    } catch {
+      // Sieć padła — niżej próbujemy cache'u.
+    }
+    const cached = await caches.match(request, { ignoreSearch: true })
+      || await caches.match(OFFLINE_FALLBACK, { ignoreSearch: true });
+    if (cached) return cached;
+    return networkPromise;
+  }
+
+  try {
+    return await networkPromise;
   } catch (error) {
     const cached = await caches.match(request, { ignoreSearch: true });
     if (cached) return cached;
-    if (fallbackToDocument) {
-      const document = await caches.match(OFFLINE_FALLBACK, { ignoreSearch: true });
-      if (document) return document;
-    }
     throw error;
   }
 };

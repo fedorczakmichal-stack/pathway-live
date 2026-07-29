@@ -92,8 +92,15 @@
   (function () {
     // Telefon: ramka-w-ramce gubi safe-area (iOS nie przekazuje env() do
     // iframe) — otwieramy pelna apke bezposrednio.
-    if (window.matchMedia('(max-width: 520px)').matches) {
-      window.location.replace('./index.html');
+    // 2026-07-29: przekierowanie po DOTYKU, nie po szerokości. Telefon w
+    // trybie "Request Desktop Website" ma viewport ~980 px, więc warunek
+    // szerokości nie odpalał i uzytkownik ogladal apke w narysowanej ramce
+    // telefonu zamiast na pelnym ekranie. ?frame=1 zostawia ramke na sile.
+    var touch = (navigator.maxTouchPoints || 0) > 0
+      || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    var narrow = window.matchMedia('(max-width: 520px)').matches;
+    if (!/[?&]frame=1\b/.test(location.search) && (touch || narrow)) {
+      window.location.replace('./index.html' + location.hash);
       return;
     }
     var fit = function () {
