@@ -1,0 +1,19 @@
+{
+  "id": "/pathway-live/",
+  "name": "Pathway — living map",
+  "short_name": "Pathway",
+  "description": "A living map that turns one goal into a path on real streets.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071d18",
+  "theme_color": "#071d18",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    { "src": "./icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
