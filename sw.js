@@ -7,7 +7,7 @@
  * wersję — aktywacja kasuje wszystkie poprzednie. skipWaiting + clients.claim
  * sprawiają, że nowy worker przejmuje stronę od razu, bez zamykania kart.
  */
-const VERSION = "v63";
+const VERSION = "v67";
 const CACHE = `pathway-${VERSION}`;
 const OFFLINE_FALLBACK = "./index.html";
 
