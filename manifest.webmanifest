@@ -3,7 +3,7 @@
   "name": "Pathway — living map",
   "short_name": "Pathway",
   "description": "A living map that turns one goal into a path on real streets.",
-  "start_url": "./index.html?v=77",
+  "start_url": "./index.html?v=78",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
