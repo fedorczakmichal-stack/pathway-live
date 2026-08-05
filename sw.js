@@ -7,7 +7,7 @@
  * wersję — aktywacja kasuje wszystkie poprzednie. skipWaiting + clients.claim
  * sprawiają, że nowy worker przejmuje stronę od razu, bez zamykania kart.
  */
-const VERSION = "v78";
+const VERSION = "v79";
 const CACHE = `pathway-${VERSION}`;
 const OFFLINE_FALLBACK = "./index.html";
 
@@ -16,7 +16,7 @@ const OFFLINE_FALLBACK = "./index.html";
 // oddawałby STARY dokument mimo działającej sieci, czyli dokładnie ten ból,
 // przed którym ten worker ma chronić. `cache: "no-cache"` wymusza rewalidację
 // (tanią: przy braku zmian wraca 304 bez treści), a NIE "reload", który
-// ściągałby 5,3 MB przy każdym otwarciu apki.
+// ściągałby ~14 MB (gzip) przy każdym otwarciu apki.
 const revalidating = (request) => new Request(request.url, {
   cache: "no-cache",
   credentials: "same-origin",
@@ -61,7 +61,8 @@ const putInCache = async (request, response) => {
   }
 };
 
-// Dokument waży 5,3 MB, więc na słabym LTE albo w captive portalu fetch
+// Dokument waży ~21 MB (gzip ~14 MB), więc na słabym LTE albo w captive
+// portalu fetch
 // potrafi wisieć dziesiątki sekund — a zainstalowana apka stoi wtedy na
 // splashu, mimo że kompletna kopia leży w cache'u. Po SLOW_NETWORK_MS
 // oddajemy cache, ale pobieranie leci dalej i i tak odświeży cache.
